@@ -368,8 +368,7 @@ ggplot(flows, aes(x = factor(year), y=flow)) +
 **2. Temporal Trend Check**
 
 @fig-q4-fig2 plots the yearly mean river flow from 2015 to 2024 with a fitted linear trend.
-The regression line indicates a positive slope, showing an overall upward trend in mean flow. However, interannual fluctuations are evident, with temporary drops around 2018 and 2023. Thus, rather than a smooth gradual increase, the series shows variable but net rising behaviour, suggesting weak non-stationarity in the mean level of flow.
-
+The regression line indicates a positive slope, showing an overall upward trend in mean flow. However, interannual fluctuations are noticeable, with temporary drops around 2018 and 2023. This pattern suggests a weak upward trend that is not strong enough to indicate significant non-stationarity in the mean level of flow.
 
 ```{r fig-q4-fig2}
 #| echo: false
@@ -389,8 +388,7 @@ flows %>%
 
 **3. Check GPD fit for Exceedances > 75 cumecs**
 
-@fig-q4-fig3 presents the QQ-plot comparing empirical exceedances (flows above 75 cumecs) with theoretical quantiles from the GPD($\sigma=29.7$, $\xi=0.62$, $u=0$). A perfect GPD fit would show all points lying closely along the 45° dashed line. Here, the lower quantiles align well, but the upper tail deviates upward - empirical values exceed theoretical ones. This upward curvature suggests that the specified shape parameter $\xi$ may underestimate tail heaviness. Thus, the GPD fit is imperfect for the most extreme flows.
-
+@fig-q4-fig3 presents the QQ-plot comparing empirical exceedances (flows above 75 cumecs) with theoretical quantiles from the GPD($\sigma=29.7$, $\xi=0.62$, $u=0$). A perfect GPD fit would show all points lying closely along the 45° dashed line. Here, the lower quantiles align well, but the upper tail systematically deviates upward - empirical values exceed theoretical ones. This upward curvature suggests the specified shape parameter $\xi$ underestimates tail heaviness, meaning the actual tail is heavier than implied by the given GPD.
 
 ```{r fig-q4-fig3}
 #| echo: false

@@ -2659,7 +2659,7 @@ Figure 2: Annual distribution of river flow (2015–2024). Stable medians/sprea
 </div>
 </div>
 <p><strong>2. Temporal Trend Check</strong></p>
-<p><a href="#fig-q4-fig2" class="quarto-xref">Figure 3</a> plots the yearly mean river flow from 2015 to 2024 with a fitted linear trend. The regression line indicates a positive slope, showing an overall upward trend in mean flow. However, interannual fluctuations are evident, with temporary drops around 2018 and 2023. Thus, rather than a smooth gradual increase, the series shows variable but net rising behaviour, suggesting weak non-stationarity in the mean level of flow.</p>
+<p><a href="#fig-q4-fig2" class="quarto-xref">Figure 3</a> plots the yearly mean river flow from 2015 to 2024 with a fitted linear trend. The regression line indicates a positive slope, showing an overall upward trend in mean flow. However, interannual fluctuations are noticeable, with temporary drops around 2018 and 2023. This pattern suggests a weak upward trend that is not strong enough to indicate significant non-stationarity in the mean level of flow.</p>
 <div class="cell">
 <div class="cell-output cell-output-stderr">
 <pre><code>`geom_smooth()` using formula = &#39;y ~ x&#39;</code></pre>
@@ -2678,7 +2678,7 @@ Figure 3: Yearly mean flow with linear trend. A flat trend supports stationarit
 </div>
 </div>
 <p><strong>3. Check GPD fit for Exceedances &gt; 75 cumecs</strong></p>
-<p><a href="#fig-q4-fig3" class="quarto-xref">Figure 4</a> presents the QQ-plot comparing empirical exceedances (flows above 75 cumecs) with theoretical quantiles from the GPD(<span class="math inline">\(\sigma=29.7\)</span>, <span class="math inline">\(\xi=0.62\)</span>, <span class="math inline">\(u=0\)</span>). A perfect GPD fit would show all points lying closely along the 45° dashed line. Here, the lower quantiles align well, but the upper tail deviates upward - empirical values exceed theoretical ones. This upward curvature suggests that the specified shape parameter <span class="math inline">\(\xi\)</span> may underestimate tail heaviness. Thus, the GPD fit is imperfect for the most extreme flows.</p>
+<p><a href="#fig-q4-fig3" class="quarto-xref">Figure 4</a> presents the QQ-plot comparing empirical exceedances (flows above 75 cumecs) with theoretical quantiles from the GPD(<span class="math inline">\(\sigma=29.7\)</span>, <span class="math inline">\(\xi=0.62\)</span>, <span class="math inline">\(u=0\)</span>). A perfect GPD fit would show all points lying closely along the 45° dashed line. Here, the lower quantiles align well, but the upper tail systematically deviates upward - empirical values exceed theoretical ones. This upward curvature suggests the specified shape parameter <span class="math inline">\(\xi\)</span> underestimates tail heaviness, meaning the actual tail is heavier than implied by the given GPD.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div id="fig-q4-fig3" class="quarto-float quarto-figure quarto-figure-center anchored">
