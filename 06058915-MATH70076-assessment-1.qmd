@@ -155,7 +155,7 @@ Does your answer:
 #' Computes the quantiles x_p of GPD(u, sigma, xi) for probabiltiies p in [0,1].
 #' Supports log.p and upper/lower tails. Vectorised over p.
 #' 
-#' @param p Probabilities (numeric vector, 0 ≤ p ≤ 1)
+#' @param p Probabilities (numeric vector, 0<=p<=1)
 #' @param u Threshold parameter
 #' @param sigma Scale (>0)
 #' @param xi Shape
@@ -176,8 +176,8 @@ qgpd <- function(p, u = 0, sigma = 1, xi = 0, lower.tail = TRUE, log.p = FALSE) 
 
   # transform probabilities
   p <- as.numeric(p)
-  if (log.p) p <- exp(p)          # accept log-probabilities
-  if (!lower.tail) p <- 1 - p     # convert upper-tail to lower-tail
+  if (log.p) p <- exp(p)
+  if (!lower.tail) p <- 1 - p     
   if (any(p < 0 | p > 1, na.rm = TRUE)) stop("All probabilities must be in [0, 1].")
 
   # compute quantiles
@@ -247,7 +247,7 @@ For each dataset, the empirical sample was sorted, and theoretical quantiles wer
 
 Alignment with the 45° dashed line indicates agreement with the theoretical distribution.
 A slope deviation reflects a scale ($\sigma$) mismatch, a parallel shift indicates an incorrect threshold ($u$), and curvature suggests a mis-specified shape ($\xi$).
-Two diagnostics — the regression slope (ideal ≈ 1) and the RMSE of residuals — were used to quantify these deviations.
+Two diagnostics — the regression slope (ideal$≈$1) and the RMSE of residuals — were used to quantify these deviations.
 
 ```{r q3}
 #| echo: false
@@ -389,12 +389,12 @@ flows %>%
 
 **3. Check GPD fit for Exceedances > 75 cumecs**
 
-@fig-q4-fig3 presents the QQ-plot comparing empirical exceedances (flows above 75 cumecs) with theoretical quantiles from the GPD($\sigma=29.7$,$\xi=0.62$, $u=0$). A perfect GPD fit would show all points lying closely along the 45° dashed line. Here, the lower quantiles align well, but the upper tail deviates upward - empirical values exceed theoretical ones. This upward curvature suggests that the specified shape parameter $\xi$ may underestimate tail heaviness. Thus, the GPD fit is imperfect for the most extreme flows.
+@fig-q4-fig3 presents the QQ-plot comparing empirical exceedances (flows above 75 cumecs) with theoretical quantiles from the GPD($\sigma=29.7$, $\xi=0.62$, $u=0$). A perfect GPD fit would show all points lying closely along the 45° dashed line. Here, the lower quantiles align well, but the upper tail deviates upward - empirical values exceed theoretical ones. This upward curvature suggests that the specified shape parameter $\xi$ may underestimate tail heaviness. Thus, the GPD fit is imperfect for the most extreme flows.
 
 
 ```{r fig-q4-fig3}
 #| echo: false
-#| fig-cap: "QQ-plot of exceedances (flow-75) vs GPD(sigma = 29.7, xi = 0.62, u = 0)."
+#| fig-cap: "QQ-plot of exceedances (flow-75) vs GPD(sigma=29.7, xi=0.62, u=0)."
 # Q4-fig3
 exceed <- flows$flow[flows$flow > 75] - 75
 exceed <- sort(exceed)
@@ -407,7 +407,7 @@ qq_df <- data.frame(theoretical = q_theoretical, empirical = exceed)
 ggplot(qq_df, aes(theoretical, empirical)) +
   geom_point(alpha = 0.7) +
   geom_abline(slope = 1, intercept = 0, linetype = "dashed") +
-  labs(title = "QQ-plot for Exceedances (>75) vs GPD(σ=29.7, ξ=0.62, u=0)",
+  labs(title = "QQ-plot for Exceedances (>75) vs GPD(sigma=29.7, xi=0.62, u=0)",
        x = "Theoretical Quantiles", y = "Empirical Quantiles (exceed)") +
   theme_minimal()
 ```
