@@ -434,7 +434,7 @@ ggplot(plot_df, aes(thresholds, mean_excess)) +
   theme_minimal()
 ```
 
-**Conclusion**
+**Conclusion.**
 
 Overall, annual boxplots and mean trends show generally stable flow distributions with mild year-to-year variation and a slight upward trend, suggesting weak non-stationarity rather than a clear long-term change.
 For exceedances above 75 cumecs, the QQ-plot and mean excess plot both indicate heavier tails and upward curvature, indicating that the assumed GPD($\sigma=29.7$, $\xi=0.62$, $u=0$) underestimates extreme flows.
