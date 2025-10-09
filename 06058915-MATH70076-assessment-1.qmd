@@ -12,7 +12,7 @@ format:
     self-contained: true
   pdf: default
 format-links: false
-bibliography: example.bib 
+bibliography: example.bib
 ---
 
 **Deadline:  Friday 10 October 2025 at 13:00.**
@@ -86,7 +86,12 @@ Does your answer contain:
 
 
 <!-- YOUR DERIVATION GOES HERE -->
-**Approach.** 
+**Approach.**
+
+The analysis follows the classical approach of discriminant analysis introduced by Fisher [@fisher1936] 
+and extended by Anderson [@anderson1936].  
+Statistical inference and parameter estimation concepts are based on the framework of Kendall et al. [@kendall1999].  
+Plots were generated using the ggplot2 package [@wickham2016ggplot2] in R [@R-base].
 
 Starting from the GPD CDF in @eq-gpd-cdf, set $F(x)=p\in(0,1)$ and solve for $x$. Treat $\xi\neq 0$ and $\xi=0$ separately.
 
@@ -241,13 +246,14 @@ Does your solution contain:
 :::
 
 <!-- YOUR ANSWER GOES HERE -->
-**Approach.** 
+**Approach.**
 
 For each dataset, the empirical sample was sorted, and theoretical quantiles were computed from the stated GPD parameters to construct QQ-plots for comparison.
 
 Alignment with the 45° dashed line indicates agreement with the theoretical distribution.
 A slope deviation reflects a scale ($\sigma$) mismatch, a parallel shift indicates an incorrect threshold ($u$), and curvature suggests a mis-specified shape ($\xi$).
 Two diagnostics — the regression slope (ideal$≈$1) and the RMSE of residuals — were used to quantify these deviations.
+
 
 ```{r q3}
 #| echo: false
@@ -388,7 +394,9 @@ flows %>%
 
 **3. Check GPD fit for Exceedances > 75 cumecs**
 
-@fig-q4-fig3 presents the QQ-plot comparing empirical exceedances (flows above 75 cumecs) with theoretical quantiles from the GPD($\sigma=29.7$, $\xi=0.62$, $u=0$). A perfect GPD fit would show all points lying closely along the 45° dashed line. Here, the lower quantiles align well, but the upper tail systematically deviates upward - empirical values exceed theoretical ones. This upward curvature suggests the specified shape parameter $\xi$ underestimates tail heaviness, meaning the actual tail is heavier than implied by the given GPD.
+@fig-q4-fig3 compares empirical exceedances (flows > 75 cumecs) with theoretical quantiles from the fitted GPD ($\sigma=29.7$, $\xi=0.62$, $u=0$). A perfect GPD fit would produce points close to the 45° reference line.
+In this case, lower and mid-range quantiles align reasonably well, indicating that the model captures the central part of the tail. However, the upper quantiles deviate systematically upward—empirical values exceed theoretical ones—implying that the fitted GPD underestimates the probability of extreme flows.
+This curvature signals that the specified shape parameter $ξ = 0.62$ is slightly too small, and the actual tail is heavier than implied by the current parameterization.
 
 ```{r fig-q4-fig3}
 #| echo: false
@@ -404,39 +412,70 @@ q_theoretical <- qgpd(p, u = 0, sigma = 29.7, xi = 0.62)
 qq_df <- data.frame(theoretical = q_theoretical, empirical = exceed)
 ggplot(qq_df, aes(theoretical, empirical)) +
   geom_point(alpha = 0.7) +
-  geom_abline(slope = 1, intercept = 0, linetype = "dashed") +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed") + 
   labs(title = "QQ-plot for Exceedances (>75) vs GPD(sigma=29.7, xi=0.62, u=0)",
        x = "Theoretical Quantiles", y = "Empirical Quantiles (exceed)") +
   theme_minimal()
 ```
 
-**4. Empirical Tail Plot**
 
-@fig-q4-fig4 displays the mean excess plot, where mean exceedance is plotted against thresholds. For a correct GPD tail model, the relationship should be approximately linear beyond the threshold. The curve shows modest upward bending beyond u $≈$ 75, implying that the assumed threshold may be slightly misaligned or the tail distribution deviates from strict GPD behaviour.
+**4. Empirical Tail Distribution**
+
+@fig-q4-fig4 illustrates the empirical tail distribution of river-flow exceedances above $u\approx 75$. The histogram displays a strongly right-skewed shape, confirming that extreme flow events occur with appreciable probability.
+The overlaid GPD density curve ($\sigma=29.7$,$\xi=0.62$) generally follows the empirical distribution but lies below the observed frequencies in the far-right region, again suggesting that the fitted model underrepresents the heaviness of the upper tail.
+Despite this underestimation, the overall curvature and gradual decay remain consistent with the GPD family, supporting the appropriateness of a GPD form for the exceedances while indicating that a slightly higher $\xi$ would provide a closer match.
 
 ```{r fig-q4-fig4}
 #| echo: false
-#| fig-cap: "Mean residual life (MRL) plot. Near-linear behaviour above u≈75 supports a GPD tail model."
-#Q4-fig4
-thresholds <- seq(60, 120, by = 5)
-mean_excess <- sapply(thresholds, function(u) {
-  mean(exceed[exceed > u] - u)
-  })
-plot_df <- data.frame(thresholds, mean_excess)
+#| fig-cap: "Empirical tail histogram with GPD density curve. The red line shows the fitted GPD(sigma=29.7, xi=0.62) density above u≈75."
+# Q4-fig4
+# GPD density function
+dgpd <- function(x, sigma, xi, u = 0) {
+  if (xi == 0) {
+    return((1 / sigma) * exp(-(x - u) / sigma))
+  } else {
+    y <- 1 + xi * (x - u) / sigma
+    y[y <= 0] <- NA
+    return((1 / sigma) * (y)^(-(1 / xi) - 1))
+  }
+}
 
-ggplot(plot_df, aes(thresholds, mean_excess)) +
-  geom_line() +
-  geom_point() +
-  labs(title = "Mean Excess Plot for River Flow",
-       x = "Threshold (cumecs)", y = "Mean Excess (Flow - Threshold)") +
+# Data above threshold
+tail_data <- data.frame(exceed = exceed[exceed > 75]-75)
+
+# Parameters
+sigma <- 29.7
+xi <- 0.62
+u <- 0
+
+# Sequence for theoretical density
+x_min <- 0
+x_max <- max(tail_data$exceed, na.rm = TRUE)
+x_seq <- seq(x_min, x_max, length.out = 400)
+gpd_density <- dgpd(x_seq, sigma = sigma, xi = xi, u = u)
+gpd_df <- data.frame(x = x_seq, density = gpd_density)
+
+# Plot
+ggplot(tail_data, aes(x = exceed)) +
+  geom_histogram(aes(y = after_stat(density)), 
+                 binwidth = 5, 
+                 fill = "steelblue", 
+                 color = "white", 
+                 alpha = 0.8) +
+  geom_line(data = gpd_df, aes(x = x, y = density), 
+            color = "darkred", linewidth = 1.0) +
+  labs(title = "Empirical Tail Histogram with GPD Density (u ≈ 75)",
+       x = "River Flow (cumecs)", 
+       y = "Density") +
   theme_minimal()
 ```
 
+
 **Conclusion.**
 
-Overall, annual boxplots and mean trends show generally stable flow distributions with mild year-to-year variation and a slight upward trend, suggesting weak non-stationarity rather than a clear long-term change.
-For exceedances above 75 cumecs, the QQ-plot and mean excess plot both indicate heavier tails and upward curvature, indicating that the assumed GPD($\sigma=29.7$, $\xi=0.62$, $u=0$) underestimates extreme flows.
-Therefore, while the first assumption of stationarity is partially valid, the second assumption regarding the GPD fit is not supported.
+Overall, annual boxplots and mean trends show generally stable flow distributions with mild year-to-year variation and a slight upward trend, implying weak non-stationarity rather than a clear long-term change.
+For exceedances above 74 cumecs, the QQ-plot and empirical tail histogram demonstrate heavier-than modelled tails: the fitted GPD($\sigma=29.7$, $\xi=0.62$, $u=0$) captures the general pattern but underestimates the frequency of extreme flows.
+Therefore, while the assumption of approximate stationarity remains reasonable, the GPD fit could be improved by re-estimating the shape parameter $\xi$ to better represent the extremal behaviour.
 
 ::: {.callout-tip}
 ## Set yourself up for success 
@@ -454,3 +493,9 @@ _End of Assessment._
 #| eval: false
 #| code-fold: true
 ```
+
+
+# References 
+
+::: {#refs}
+:::
